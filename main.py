@@ -23,8 +23,16 @@ async def on_ready():
 #Dealign with commands
 @client.event
 async def on_message(message):
+    #Ingore any messages from bots
+    if (message.author.bot):
+        return
+
     #Test and autocomplete the command
     cmd = command.test_command(message.content, message.server.id)
+
+    #It doesn't start with the prefix ignore it
+    if cmd["status"] == 4:
+        return
 
     #If the status was 0 (not a valid command or it doesn't start with the prefix)
     if cmd["status"] == 0:
@@ -42,12 +50,23 @@ async def on_message(message):
         await client.send_message(message.channel, "Well... this is awkward. Something broke and will be fixed soon")
         return
     
-    #If all the checks passed then get the command
+    #If all the checks passed then get the command and arguments
+    args = cmd["args"]
+    prefix = cmd["prefix"]
     cmd = cmd["matches"][0]
 
     #Stop the bot
     if cmd == "stop":
         sys.exit()
+    
+    #Show the help message
+    if cmd == "help":
+        return
+    
+    #Displays the developers name
+    if cmd == "blacksmiths":
+        await client.send_message(message.channel, "This is a bot that was written for Discord Hack Week.\nThe development team is <@388777079455612929>, <@140611354317815808> and Wumpus")
+        return
     
     """channel = client.get_channel("592734071982129153")
     
