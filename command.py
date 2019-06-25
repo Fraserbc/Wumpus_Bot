@@ -9,7 +9,8 @@ commands = [
 	"stop",
 	"help",
 	"blacksmiths",
-	"ping"
+	"ping",
+	"code"
 ]
 
 def test_command(command, server):
