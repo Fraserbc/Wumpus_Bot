@@ -1,5 +1,6 @@
 #Needed imports
 import discord, sys, json
+from asyncio import sleep
 
 #import the command auto complete and test
 import command
@@ -18,7 +19,9 @@ token = config["token"]
 async def on_ready():
     print("The Wumpus is ready!")
     
-    client.logout()
+    #Automatically update the status to show usercount
+    client.loop.create_task(update_status())
+    print("Started update_status()")
 
 #Dealign with commands
 @client.event
@@ -62,10 +65,26 @@ async def on_message(message):
     #Show the help message
     if cmd == "help":
         return
-    
-    #Displays the developers name
+
+    #Pong!    
+    if cmd == "ping":
+        await client.send_message(message.channel, "Pong!")
+        return
+
+    #Displays the developers names
     if cmd == "blacksmiths":
         await client.send_message(message.channel, "This is a bot that was written for Discord Hack Week.\nThe development team is <@388777079455612929>, <@140611354317815808> and Wumpus")
+        return
+    
+    #Shows the bot statistics
+    if cmd == "botstats":
+        #Get the statistics
+        users = len([x for x in list(dict.fromkeys(list(client.get_all_members()))) if str(x.status) != "offline"])
+        servers = len(client.servers)
+
+        #Send them in an embed so it looks cool
+        embed = discord.Embed(title="Bot Statistics", description="Bot Version - Alpha\nGaming with {} discordians in {} servers".format(users,servers), color=0x972ed9)
+        await client.send_message(message.channel, embed=embed)
         return
     
     """channel = client.get_channel("592734071982129153")
@@ -77,6 +96,18 @@ async def on_message(message):
 
     await client.send_message(channel, embed=e)"""
     return
+
+#Update status every 10 seconds
+async def update_status():
+    while True:
+        #How many users are online (removes duplicates)
+        users = len([x for x in list(dict.fromkeys(list(client.get_all_members()))) if str(x.status) != "offline"])
+
+        #Change the status
+        await client.change_presence(game=discord.Game(name='Games with {} discordians'.format(users)))
+        
+        #Sleep so I don't DOS the API
+        await sleep(10)
 
 #Start the bot
 client.run(token)

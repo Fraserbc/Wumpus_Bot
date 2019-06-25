@@ -1,13 +1,15 @@
 prefixs = {
 	"default":"w!",
-	"592734071482744855":"w!"
+	"592734071482744855":"w!",
+	"571045813443362826":"w!"
 }
 
 commands = [
-	"abcd",
+	"botstats",
 	"stop",
 	"help",
-	"blacksmiths"
+	"blacksmiths",
+	"ping"
 ]
 
 def test_command(command, server):
