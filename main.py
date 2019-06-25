@@ -5,6 +5,9 @@ from asyncio import sleep
 #import the command auto complete and test
 import command
 
+#Build-a-Wumpus/profiles library
+import baw
+
 #Set the client instance
 client = discord.Client()
 
@@ -22,6 +25,9 @@ async def on_ready():
 	#Automatically update the status to show usercount
 	client.loop.create_task(update_status())
 	print("Started update_status()")
+
+	#get the prefixs from the db
+	command.update_prefixs()
 
 #Dealign with commands
 @client.event
@@ -97,6 +103,10 @@ Other features
 		#Send them in an embed so it looks cool
 		embed = discord.Embed(title="Bot Statistics", description="Bot Version - Alpha\nGaming with {} discordians in {} servers".format(users,servers), color=0x972ed9)
 		await client.send_message(message.channel, embed=embed)
+		return
+
+	#Show the users profile
+	if cmd == "profile":
 		return
 	
 	#Share a link to the github

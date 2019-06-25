@@ -1,8 +1,11 @@
-prefixs = {
+#Import the database handler
+import db_handler
+
+"""prefixs = {
 	"default":"w!",
 	"592734071482744855":"w!",
 	"571045813443362826":"w!"
-}
+}"""
 
 commands = [
 	"botstats",
@@ -13,11 +16,33 @@ commands = [
 	"code"
 ]
 
+#Initialize the prefixs from the sql database
+prefixs = {}
+def update_prefixs():
+	global prefixs
+	prefixs = db_handler.get_prefixs()
+	prefixs["default"] = "w!"
+
+#Command autocompletion
+def autocomplete(command):
+	#Autocomplete command
+	matches = []
+	for cmd in commands:
+		if cmd.startswith(command):
+			matches.append(cmd)
+	
+	return matches
+
+#Test and autocomplete the command
 def test_command(command, server):
 	#Test if it is actaully a server and not a dm
 	if server == None:
-		command = command.replace(prefixs["default"], "", 1)
-		return {"status":1,"matches":[command],"prefix":None,"args":[]}
+		if command.startswith(prefixs["default"]):
+			command = command.replace(prefixs["default"], "", 1)
+			return {"status":1,"matches":[command],"prefix":None,"args":[]}
+		
+		#The prefix doesn't match
+		return {"status":4,"matches":None,"prefix":None,"args":[]}
 	#It is a server so check if the prefix exists just to be sure
 	elif server in prefixs:
 		#Checks the command matches the prefix
@@ -30,11 +55,8 @@ def test_command(command, server):
 			args = command[1:]
 			command = command[0]
 
-			#Autocomplete command
-			matches = []
-			for cmd in commands:
-				if cmd.startswith(command):
-					matches.append(cmd)
+			#Autocomplete the command if neccessary
+			matches = autocomplete(command)
 			
 			#If there are no matches it is not a valid command
 			if len(matches) == 0:
@@ -51,4 +73,5 @@ def test_command(command, server):
 		return {"status":4,"matches":None,"prefix":None,"args":[]}
 	
 	#No prefix was found, something broke help
+	print(prefixs)
 	return {"status":-1,"matches":None,"prefix":None,"args":[]}
