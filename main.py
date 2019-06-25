@@ -37,7 +37,7 @@ async def on_message(message):
 		return
 
 	#Test and autocomplete the command
-	cmd = command.test_command(message.content, message.server.id)
+	cmd = command.test_command(message.content, message.server)
 
 	#It doesn't start with the prefix ignore it
 	if cmd["status"] == 4:
@@ -45,18 +45,23 @@ async def on_message(message):
 
 	#If the status was 0 (not a valid command or it doesn't start with the prefix)
 	if cmd["status"] == 0:
-		await client.send_message(message.channel, "That wasn't a valid command! Use {}help for a list of commands!".format(cmd["prefix"]))
+		desc = "That wasn't a valid command! Use {}help for a list of commands!".format(cmd["prefix"])
+		embed = discord.Embed(title="Invalid Command", description=desc, color=0x972ed9)
+		await client.send_message(message.channel, embed=embed)
 		return
 	
 	#If there are multiple matches suggest them to the user
 	if cmd["status"] == 2:
-		text = '\n    {}'.format( cmd["prefix"] ).join( [""] + cmd["matches"] )
-		await client.send_message(message.channel, "Did you mean:{}".format(text))
+		desc = '\n    {}'.format( cmd["prefix"] ).join( [""] + cmd["matches"] )
+		embed = discord.Embed(title="Did you mean", description=desc, color=0x972ed9)
+		await client.send_message(message.channel, embed=embed)
 		return
 	
 	#If something broken
 	if cmd["status"] == -1:
-		await client.send_message(message.channel, "Well... this is awkward. Something broke and will be fixed soon")
+		desc = "Well... this is awkward. Something broke and will be fixed soon. Try again in a few minutes."
+		embed = discord.Embed(title="Wumpus tripped over a wire", description=desc, color=0x972ed9)
+		await client.send_message(message.channel, embed=embed)
 		return
 	
 	#If all the checks passed then get the command and arguments
@@ -95,7 +100,9 @@ async def on_message(message):
 
 	#Displays the developers names
 	if cmd == "blacksmiths":
-		await client.send_message(message.channel, "This is a bot that was written for Discord Hack Week.\nThe development team is <@388777079455612929>, <@140611354317815808> and Wumpus")
+		desc = "This is a bot that was written for Discord Hack Week.\nThe development team is <@388777079455612929>, <@140611354317815808> and, of course, Wumpus"
+		embed = discord.Embed(title="Blacksmiths", description=desc, color=0x972ed9)
+		await client.send_message(message.channel, embed=embed)
 		return
 	
 	#Shows the bot statistics
