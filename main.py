@@ -70,18 +70,22 @@ async def on_message(message):
 	
 	#Show the help/usage message
 	if cmd == "help":
-		await client.send_message(message.channel, """
-Wumpus Bot Help
-		{p}botstats - Shows statistics about the bot
-		{p}help - Shows this help message
-		{p}blacksmiths - Lists the development team
-		{p}ping - Pong!
-		{p}code - Link to the github (Yay! Open Source!)
+		desc =  """
+		Wumpus Bot Help
+			{p}botstats - Shows statistics about the bot
+			{p}help - Shows this help message
+			{p}blacksmiths - Lists the development team
+			{p}ping - Pong!
+			{p}code - Link to the github (Yay! Open Source!)
 
-Other features
-		-Command auto-completion for when you're too lazy to type out the whole command
-		-Build-a-Wumpus
-		""".format(p=prefix))
+		Other features
+			-Command auto-completion for when you're too lazy to type out the whole command
+			-Build-a-Wumpus
+		""".format(p=prefix)
+
+		#Embeds look nice
+		embed = discord.Embed(title="Help", description=desc, color=0x972ed9)
+		await client.send_message(message.channel, embed=embed)
 		return
 
 	#Pong!    
