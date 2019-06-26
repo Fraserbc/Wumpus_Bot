@@ -24,10 +24,14 @@ async def on_ready():
 	
 	#Automatically update the status to show usercount
 	client.loop.create_task(update_status())
-	print("Started update_status()")
+	print("Started custom status!")
 
-	#get the prefixs from the db
-	command.update_prefixs()
+	#get the prefixes from the db
+	command.update_prefixes()
+
+	#Update the sql db with all the prefixes from the json
+	client.loop.create_task(update_db())
+	print("Started DB updater!")
 
 #Dealign with commands
 @client.event
@@ -71,17 +75,19 @@ async def on_message(message):
 
 	#Stop the bot
 	if cmd == "stop":
+		#Write the prefixes so the prefix is saved
+		command.write_prefixes()
 		sys.exit()
 	
 	#Show the help/usage message
 	if cmd == "help":
 		desc =  """
-		Wumpus Bot Help
 			{p}botstats - Shows statistics about the bot
 			{p}help - Shows this help message
 			{p}blacksmiths - Lists the development team
 			{p}ping - Pong!
 			{p}code - Link to the github (Yay! Open Source!)
+			{p}prefix [New Prefix] - Set the prefix for the server
 
 		Other features
 			-Command auto-completion for when you're too lazy to type out the whole command
@@ -89,13 +95,13 @@ async def on_message(message):
 		""".format(p=prefix)
 
 		#Embeds look nice
-		embed = discord.Embed(title="Help", description=desc, color=0x972ed9)
+		embed = discord.Embed(title="Wumpus Bot Help", description=desc, color=0x972ed9)
 		await client.send_message(message.channel, embed=embed)
 		return
 
 	#Pong!    
 	if cmd == "ping":
-		await client.send_message(message.channel, "Pong!")
+		await client.send_message(message.channel, "Pong! {}".format(' '.join(args)))
 		return
 
 	#Displays the developers names
@@ -124,6 +130,25 @@ async def on_message(message):
 	if cmd == "code":
 		await client.send_message(message.channel, "https://github.com/Fraserbc/Wumpus_Bot")
 		return
+	
+	#Set the prefix command
+	if cmd == "prefix":
+		#Check they have the correct permissions
+		if message.server == None or not message.author.server_permissions.administrator:
+			embed = discord.Embed(title="Permission Denied", description="You need to have administrator permissions in this server to change the prefix!", color=0x972ed9)
+			await client.send_message(message.channel, embed=embed)
+			return
+		
+		#They have permission so set the prefix so check if they supplied an argument
+		if len(args) == 0:
+			embed = discord.Embed(title="No Arguments Supplied", description="You need to supply an argument!\nCheck {}help for the syntax".format(prefix), color=0x972ed9)
+			await client.send_message(message.channel, embed=embed)
+			return
+		
+		#Set the prefix
+		command.prefixes[message.server.id] = args[0]
+		embed = discord.Embed(title="Prefix Changed", description="You have successfully changed the prefix to {}".format(args[0]), color=0x972ed9)
+		await client.send_message(message.channel, embed=embed)
 
 	"""channel = client.get_channel("592734071982129153")
 	
@@ -146,6 +171,15 @@ async def update_status():
 		
 		#Sleep so I don't DOS the API
 		await sleep(10)
+
+#Update the db every 5 mins
+async def update_db():
+	while True:
+		#Update the prefixes
+		command.write_prefixes()
+
+		#Wait for 5 mins
+		await sleep(60*5)		
 
 #Start the bot
 client.run(token)

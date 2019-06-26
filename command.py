@@ -7,14 +7,18 @@ commands = [
 	"help",
 	"blacksmiths",
 	"ping",
-	"code"
+	"code",
+	"prefix"
 ]
 
-#Initialize the prefixs from the sql database
-def update_prefixs():
-	global prefixs
-	prefixs = db_handler.get_prefixs()
-	prefixs["default"] = "w!"
+#Initialize the prefixes from the sql database
+def update_prefixes():
+	global prefixes
+	prefixes = db_handler.get_prefixes()
+
+#Write the prefixes to the db
+def write_prefixes():
+	db_handler.set_prefixes(prefixes)
 
 #Command autocompletion
 def autocomplete(command):
@@ -50,22 +54,22 @@ def check_matches(command, prefix):
 def test_command(command, server):
 	#Test if it is actaully a server and not a dm
 	if server == None:
-		if command.startswith(prefixs["default"]):
-			return check_matches(command, prefixs["default"])
+		if command.startswith(prefixes["default"]):
+			return check_matches(command, prefixes["default"])
 		
 		#The prefix doesn't match
 		return {"status":4,"matches":None,"prefix":None,"args":[]}
 	
 	#It is a server so check if the prefix exists just to be sure
-	elif server.id in prefixs:
+	elif server.id in prefixes:
 		#Checks the command matches the prefix
-		if command.startswith(prefixs[server.id]):
-			prefix = prefixs[server.id]
+		if command.startswith(prefixes[server.id]):
+			prefix = prefixes[server.id]
 			return check_matches(command, prefix)
 		
 		#It doesn't start with the prefix
 		return {"status":4,"matches":None,"prefix":None,"args":[]}
 	
 	#No prefix was found, something broke help
-	print(prefixs)
+	print(prefixes)
 	return {"status":-1,"matches":None,"prefix":None,"args":[]}
