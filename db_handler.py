@@ -63,13 +63,14 @@ def get_profile(id):
 	return json
 
 #Set the profile
-def set_profile(id, color, badge, extra):
+def set_profile(userid, color, badge, extra):
 	#Create the query
 	query = """
-	INSERT OR REPLACE INTO users (id, pfp) VALUES (?,?)
+	INSERT OR REPLACE INTO users (id, pfp) VALUES (?, ?)
 	"""
 
 	#Create the json
-	json = str({"wumpus":color,"badge":badge,"extra":extra})
+	json = str({"wumpus":color,"badge":badge,"extra":extra}).replace("'", "\"")
 
 	#Run it
+	cur.execute(query, (userid, json))

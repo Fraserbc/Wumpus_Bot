@@ -24,8 +24,43 @@ abbr = {
 	"moustache":"mous",
 	"pipe":"pipe",
 	"hackweek":"hack",
-	"lgbt":"lgbt"
+	"lgbt":"lgbt",
+	"black":"black",
+	"white":"polar",
+	"brown":"brown",
+	"none":"none"
 }
+
+#Ask a question and get a response
+async def ask_question(channel, title, question, error_message, answers, client, discord):
+	#Ask the question
+	embed = discord.Embed(title=title, description=question, color=0x972ed9)
+	await client.send_message(channel, embed=embed)
+	
+	#Check the answer and tell bots no
+	while True:
+		#Wait for answer
+		r = await client.wait_for_message(channel=channel)
+		
+		#No bad bot
+		if r.author.bot:
+			return
+		
+		#Lowercase becuase people do this BrOwN
+		r = r.content.lower()
+		
+		answer = ""
+		for x in answers:
+			if r == x:
+				answer = x
+		
+		if answer != "":
+			break
+		
+		embed = discord.Embed(title=title, description=error_message, color=0x972ed9)
+		await client.send_message(channel, embed=embed)
+	
+	return answer
 
 #Build-a-Wumpus
 async def build_a_wumpus(discord, client, channel, userid):
@@ -37,58 +72,25 @@ async def build_a_wumpus(discord, client, channel, userid):
 	await client.send_message(channel, embed=embed)
 
 	#Ask for color
-	embed = discord.Embed(title="Build-a-Wumpus", description="What color do you want your Wumpus to be? White, Black or Brown", color=0x972ed9)
-	await client.send_message(channel, embed=embed)
-	
-	while True:
-		r = await client.wait_for_message(channel=channel).lower()
-		
-		color = ""
-		for x in ["white", "black", "brown"]:
-			if r == x:
-				color = x
-		
-		if color != "":
-			break
-		
-		embed = discord.Embed(title="Build-a-Wumpus", description="That wasn't a valid color!\nPlease enter White, Black or Brown", color=0x972ed9)
-		await client.send_message(channel, embed=embed)
+	color = await ask_question(channel, "Build-a-Wumpus", "What color do you want your Wumpus to be? White, Black, Brown", "That wasn't a valid color!\nPlease enter White, Black, Brown", ["white", "black", "brown"], client, discord)
+
+	#If bot, stop
+	if color == None:
+		return
 
 	#Ask what badge they want
-	embed = discord.Embed(title="Build-a-Wumpus", description="What badge do you want you wumpus to have? LGBT or HackWeek", color=0x972ed9)
-	await client.send_message(channel, embed=embed)
-	
-	while True:
-		r = await client.wait_for_message(channel=channel).lower()
-		
-		badge = ""
-		for x in ["hackweek", "lgbt"]:
-			if r == x:
-				badge = x
-		
-		if badge != "":
-			break
-		
-		embed = discord.Embed(title="Build-a-Wumpus", description="That wasn't a valid badge!\nPlease enter LGBT or HackWeek", color=0x972ed9)
-		await client.send_message(channel, embed=embed)
-	
+	badge = await ask_question(channel, "Build-a-Wumpus", "What badge do you want you wumpus to have? LGBT, HackWeek or None", "That wasn't a valid badge!\nPlease enter LGBT, HackWeek or None", ["hackweek", "lgbt", "none"], client, discord)
+
+	#If bot, stop
+	if badge == None:
+		return
+
 	#Ask what badge they want
-	embed = discord.Embed(title="Build-a-Wumpus", description="What extra do you want you wumpus to have? Bandana, Monocle, Headband, Moustache or Pipe", color=0x972ed9)
-	await client.send_message(channel, embed=embed)
+	extra = await ask_question(channel, "Build-a-Wumpus", "What extra do you want you wumpus to have? Bandana, Monocle, Headband, Moustache, Pipe or None", "That wasn't a valid extra!\nPlease enter Bandana, Monocle, Headband, Moustache, Pipe or None", ["bandana", "monocle", "headband", "moustache", "pipe", "none"], client, discord)
 	
-	while True:
-		r = await client.wait_for_message(channel=channel).lower()
-		
-		extra = ""
-		for x in ["bandana", "monocle", "headband", "moustache", "pipe"]:
-			if r == x:
-				extra = x
-		
-		if extra != "":
-			break
-		
-		embed = discord.Embed(title="Build-a-Wumpus", description="That wasn't a valid extra!\nPlease enter Bandana, Monocle, Headband, Moustache or Pipe", color=0x972ed9)
-		await client.send_message(channel, embed=embed)
+	#If bot, stop
+	if extra == None:
+		return
 
 	#Tell them their wumpus is being proccessed
 	embed = discord.Embed(title="Build-a-Wumpus", description="Your Wumpus is now being proccessed!", color=0x972ed9)
@@ -97,8 +99,13 @@ async def build_a_wumpus(discord, client, channel, userid):
 	#Proccess the badge and extras in a way the profile command can understand
 	badge = abbr[badge]
 	extra = abbr[extra]
+	color = abbr[color]
 
 	#Write to the db
-	db_handler.set_profile(id, color, badge, extra)
+	db_handler.set_profile(userid, color, badge, extra)
+
+	#Show them their glorius wumpus
+	image = get_profile(userid)
+	await client.send_file(channel, image)
 
 	return

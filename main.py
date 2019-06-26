@@ -131,7 +131,15 @@ async def on_message(message):
 
 	#Show the users profile
 	if cmd == "profile":
-		image = baw.get_profile(str(message.author.id))
+		#Get the users id
+		userid = message.author.id
+		
+		#If there is mention use that instead
+		if len(message.mentions) > 0:
+			userid = message.mentions[0].id
+		
+		#Send the profile picture
+		image = baw.get_profile(str(userid))
 		await client.send_file(message.channel, image)
 		return
 	
