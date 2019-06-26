@@ -61,3 +61,15 @@ def get_profile(id):
 	json["pfp"] = r[1]
 
 	return json
+
+#Set the profile
+def set_profile(id, color, badge, extra):
+	#Create the query
+	query = """
+	INSERT OR REPLACE INTO users (id, pfp) VALUES (?,?)
+	"""
+
+	#Create the json
+	json = str({"wumpus":color,"badge":badge,"extra":extra})
+
+	#Run it

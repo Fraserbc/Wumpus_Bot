@@ -9,7 +9,8 @@ commands = [
 	"ping",
 	"code",
 	"prefix",
-	"profile"
+	"profile",
+	"baw"
 ]
 
 #Initialize the prefixes from the sql database

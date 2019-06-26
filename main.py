@@ -33,6 +33,11 @@ async def on_ready():
 	client.loop.create_task(update_db())
 	print("Started DB updater!")
 
+#When it joins a server it add the prefix to the list
+@client.event
+async def on_server_join(server):
+	command.prefixes[server.id] = command.prefixes["default"]
+
 #Dealign with commands
 @client.event
 async def on_message(message):
@@ -89,6 +94,7 @@ async def on_message(message):
 			{p}code - Link to the github (Yay! Open Source!)
 			{p}prefix [New Prefix] - Set the prefix for the server
 			{p}profile - Show you profile
+			{p}baw - Starts build a wumpus in your DM's
 
 		Other features
 			-Command auto-completion for when you're too lazy to type out the whole command
@@ -129,6 +135,18 @@ async def on_message(message):
 		await client.send_file(message.channel, image)
 		return
 	
+	#Build a wumpus!
+	if cmd == "baw":
+		if message.server != None:
+			#Check if it is in a DM or not
+			embed = discord.Embed(title="Need to be in a DM!", description="You need to be in a DM to use this command!", color=0x972ed9)
+			await client.send_message(message.channel, embed=embed)
+			return
+		
+		#Start Build-a-Wumpus
+		await baw.build_a_wumpus(discord, client, message.channel, message.author.id)
+		return
+	
 	#Share a link to the github
 	if cmd == "code":
 		await client.send_message(message.channel, "https://github.com/Fraserbc/Wumpus_Bot")
@@ -152,16 +170,7 @@ async def on_message(message):
 		command.prefixes[message.server.id] = args[0]
 		embed = discord.Embed(title="Prefix Changed", description="You have successfully changed the prefix to {}".format(args[0]), color=0x972ed9)
 		await client.send_message(message.channel, embed=embed)
-
-	"""channel = client.get_channel("592734071982129153")
-	
-	await client.send_file(channel, "wumpus_heart.png")
-
-	e = discord.Embed()
-	e.title = "Abcd"
-
-	await client.send_message(channel, embed=e)"""
-	return
+		return
 
 #Update status every 10 seconds
 async def update_status():
