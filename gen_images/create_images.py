@@ -11,13 +11,15 @@ extras = [
 	"pipe",
 	"ban",
 	"mon",
-	"mous"
+	"mous",
+	"none"
 ]
 
 badges = [
 	"hack",
 	"lgbt",
-	"dev"
+	"dev",
+	"none"
 ]
 
 for wump in wumpus:
@@ -30,7 +32,3 @@ for wump in wumpus:
 			wump_im.paste(extra_im, (0, 0), extra_im)
 			wump_im.paste(badge_im, (0, 0), badge_im)
 			wump_im.save("../Images/{}{}{}.png".format(wump, badge, extra))
-
-for wump in wumpus:
-	wump_im = Image.open(wump+".png").convert("RGBA")
-	wump_im.save("../Images/{}NoneNone.png".format(wump))
