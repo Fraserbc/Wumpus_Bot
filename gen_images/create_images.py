@@ -27,9 +27,8 @@ for wump in wumpus:
 			wump_im = Image.open(wump).convert("RGBA")
 			badge_im = Image.open(badge).convert("RGBA")
 			extra_im = Image.open(extra).convert("RGBA")
-			print(badge)
 
 			wump_im.paste(extra_im, (0, 0), extra_im)
 			wump_im.paste(badge_im, (0, 0), badge_im)
-			wump_im.save("{}.png".format(i))
+			wump_im.save("../Images/{}.png".format(i))
 			i += 1
