@@ -88,6 +88,7 @@ async def on_message(message):
 			{p}ping - Pong!
 			{p}code - Link to the github (Yay! Open Source!)
 			{p}prefix [New Prefix] - Set the prefix for the server
+			{p}profile - Show you profile
 
 		Other features
 			-Command auto-completion for when you're too lazy to type out the whole command
@@ -124,6 +125,8 @@ async def on_message(message):
 
 	#Show the users profile
 	if cmd == "profile":
+		image = baw.get_profile(str(message.author.id))
+		await client.send_file(message.channel, image)
 		return
 	
 	#Share a link to the github

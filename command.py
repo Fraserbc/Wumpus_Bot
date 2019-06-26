@@ -8,7 +8,8 @@ commands = [
 	"blacksmiths",
 	"ping",
 	"code",
-	"prefix"
+	"prefix",
+	"profile"
 ]
 
 #Initialize the prefixes from the sql database
