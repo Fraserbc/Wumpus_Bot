@@ -8,6 +8,9 @@ import command
 #Build-a-Wumpus/profiles library
 import baw
 
+#Import the db handler
+import db_handler
+
 #Set the client instance
 client = discord.Client()
 
@@ -36,7 +39,18 @@ async def on_ready():
 #When it joins a server it add the prefix to the list
 @client.event
 async def on_server_join(server):
+	#Add the prefix to the list
 	command.prefixes[server.id] = command.prefixes["default"]
+
+	#Go thorugh all the members and give them accounts if they don't exist
+	for user in [x for x in server.members if not x.bot]:
+		db_handler.new_user(user.id)
+
+#Whenever it sees a new member join a server
+@client.event
+async def on_member_join(member):
+	if not member in list(client.get_all_members()):
+		db_handler.new_user(member.id)
 
 #Dealign with commands
 @client.event

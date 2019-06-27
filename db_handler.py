@@ -16,6 +16,14 @@ def create_tables():
 
 	cur.execute(query)
 
+#Add a new user
+def new_user(userid):
+	query = """
+	INSERT OR IGNORE INTO users (id, coins, pfp) VALUES (?, 0, '{"wumpus":"brown", "badge":"none", "extra":"none"}')
+	"""
+
+	cur.execute(query, (userid,))
+
 #Get the server prefixes
 def get_prefixes():
 	#sql statement
